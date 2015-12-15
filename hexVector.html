@@ -19,14 +19,20 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create
 function preload() {
 
     game.load.image('vector', 'assets/vectorHex.png');
-    game.load.image('ground', 'assets/platform.png');
-    game.load.image('star', 'assets/star.png');
-    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
 
 }
 
 var line, result;
 var musicSquare, musicGroup;
+var shapes = [
+    {x: 250, y: 110, width: 150, height: 150}
+];
+var shapeCentres = [
+    {x: 325, y: 110},
+    {x: 400, y: 185},
+    {x: 325, y: 260},
+    {x: 250, y: 185}
+];
 
 function create() {
 
@@ -62,13 +68,33 @@ function create() {
 
 function onDragStop(sprite, pointer) {
 
-    var bounds = line.getBounds();
-    var boundsB = musicGroup.getBounds();
+    var lineBounds = line.getBounds();
+    var rectBounds = musicGroup.getBounds();
 
-    if(Phaser.Rectangle.intersects(bounds, boundsB)) {
-        console.log("Intersects");
+    if(Phaser.Rectangle.intersects(lineBounds, rectBounds)) {
+        snapToLine(pointer);
     }
 
+}
+
+function snapToLine(pointer) {
+
+    var minDist = 1000000, centrePoint = undefined;
+    var tempDist;
+    var tempPoint = new Phaser.Point();
+    for(var i=0; i<shapeCentres.length; ++i) {
+        tempPoint.setTo(shapeCentres[i].x, shapeCentres[i].y);
+        tempDist = Phaser.Point.distance(pointer, tempPoint);
+        if(tempDist < minDist) {
+            minDist = tempDist;
+            centrePoint = i;
+        }
+    }
+    console.log("Centre point = ", centrePoint);
+    if(centrePoint != undefined) {
+        line.x = shapeCentres[centrePoint].x-10;
+        line.y = shapeCentres[centrePoint].y-60;
+    }
 }
 
 function checkOverlap(sprite) {
