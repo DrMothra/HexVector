@@ -20,6 +20,11 @@ function preload() {
 
     game.load.image('vector', 'assets/vectorHex.png');
 
+    game.load.audio('explosion', 'assets/audio/explosion.mp3');
+    game.load.audio('sword', 'assets/audio/sword.mp3');
+    game.load.audio('blaster', 'assets/audio/blaster.mp3');
+    game.load.audio('ping', 'assets/audio/p-ping.mp3');
+
 }
 
 var line, result;
@@ -33,6 +38,8 @@ var shapeCentres = [
     {x: 325, y: 260},
     {x: 250, y: 185}
 ];
+var notes = ['explosion', 'sword', 'blaster', 'ping'];
+var fx = [];
 
 function create() {
 
@@ -64,6 +71,16 @@ function create() {
     line.inputEnabled = true;
     line.input.enableDrag();
     line.events.onDragStop.add(onDragStop, this);
+
+    for(var i=0; i<notes.length; ++i) {
+        fx.push(game.add.audio(notes[i]));
+    }
+
+    //  Being mp3 files these take time to decode, so we can't play them instantly
+    //  Using setDecodedCallback we can be notified when they're ALL ready for use.
+    //  The audio files could decode in ANY order, we can never be sure which it'll be.
+
+    //game.sound.setDecodedCallback(fx, start, this);
 }
 
 function onDragStop(sprite, pointer) {
@@ -90,10 +107,21 @@ function snapToLine(pointer) {
             centrePoint = i;
         }
     }
-    console.log("Centre point = ", centrePoint);
+
+    //DEBUG
+    //console.log("Centre point = ", centrePoint);
+
     if(centrePoint != undefined) {
-        line.x = shapeCentres[centrePoint].x-10;
-        line.y = shapeCentres[centrePoint].y-60;
+        line.rotation = 0;
+        if(centrePoint % 2 === 0 ) {
+            line.rotation = 3.14159/2;
+            line.x = shapeCentres[centrePoint].x+60;
+            line.y = shapeCentres[centrePoint].y-10;
+        } else {
+            line.x = shapeCentres[centrePoint].x-10;
+            line.y = shapeCentres[centrePoint].y-60;
+        }
+        fx[centrePoint].play();
     }
 }
 
