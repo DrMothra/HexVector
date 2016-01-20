@@ -38,29 +38,47 @@ var shapeCentres = [
     {x: 325, y: 260},
     {x: 250, y: 185}
 ];
+var lineWidth = 3;
+var lineColour = 0x868686;
+var startX=250, startY=200;
+var circleSize = 10;
+var pyramidLines = [
+    {x: 350, y: 150},
+    {x: 460, y: 300},
+    {x: 250, y:400},
+    {x: 250, y: 200},
+    {x: 460, y: 300}
+];
+
 var notes = ['explosion', 'sword', 'blaster', 'ping'];
 var fx = [];
 
 function create() {
 
+    var i=0;
+    var numLines = pyramidLines.length;
     var graphics = game.add.graphics(0, 0);
 
-    // set a fill and line style
-    graphics.beginFill(0xFF3300);
-    graphics.lineStyle(10, 0xffffff, 1);
+    // set a line style
+    graphics.lineStyle(lineWidth, lineColour, 1);
+    graphics.moveTo(startX, startY);
+    for(i=0; i<numLines; ++i) {
+        graphics.lineTo(pyramidLines[i].x, pyramidLines[i].y);
+    }
 
-    graphics.moveTo(0, 400);
-    graphics.lineTo(800,400);
+    graphics.moveTo(pyramidLines[0].x, pyramidLines[0].y);
+    graphics.lineTo(pyramidLines[2].x, pyramidLines[2].y);
+
+    graphics.lineStyle(lineWidth, 0xffffff, 1);
+    graphics.beginFill(0xffffff);
+    for(i=0; i<(numLines-1); ++i) {
+        graphics.drawCircle(pyramidLines[i].x, pyramidLines[i].y, circleSize);
+    }
     graphics.endFill();
 
     musicGroup = game.add.group();
 
-    musicSquare = game.add.graphics(0, 0);
-    musicSquare.beginFill(0x000000);
-    musicSquare.lineStyle(10, 0x868686, 1);
-    musicSquare.drawRect(250, 110, 150, 150);
-    musicSquare.endFill();
-    musicGroup.add(musicSquare);
+
     musicGroup.getBounds();
 
 
@@ -72,7 +90,7 @@ function create() {
     line.input.enableDrag();
     line.events.onDragStop.add(onDragStop, this);
 
-    for(var i=0; i<notes.length; ++i) {
+    for(i=0; i<notes.length; ++i) {
         fx.push(game.add.audio(notes[i]));
     }
 
