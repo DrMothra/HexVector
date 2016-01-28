@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <title>Midi Test</title>
 
-    <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
     <!-- shim -->
     <script src="inc/shim/Base64.js" type="text/javascript"></script>
     <script src="inc/shim/Base64binary.js" type="text/javascript"></script>
     <script src="inc/shim/WebAudioAPI.js" type="text/javascript"></script>
     <script src="inc/shim/WebMIDIAPI.js" type="text/javascript"></script>
     <!-- jasmid package -->
-    <script src="inc/jasmid/stream.js"></script>
-    <script src="inc/jasmid/midifile.js"></script>
-    <script src="inc/jasmid/replayer.js"></script>
+    <script src="js/jasmid/stream.js"></script>
+    <script src="js/jasmid/midifile.js"></script>
+    <script src="js/jasmid/replayer.js"></script>
     <!-- midi.js package -->
     <script src="js/midi/audioDetect.js" type="text/javascript"></script>
     <script src="js/midi/gm.js" type="text/javascript"></script>
@@ -31,7 +30,6 @@
     <script src="./inc/colorspace.js" type="text/javascript"></script>
     <script src="./inc/event.js" type="text/javascript"></script>
 
-    <script type='text/javascript' src='js/midiTest.js'></script>
 
 </head>
 <body>
@@ -39,5 +37,24 @@
 <button id="playMidi">Play Midi</button>
 
 <button id="stopMidi">Stop Midi</button>
+
+<script type="text/javascript">
+    eventjs.add(window, "load", function(event) {
+        var player;
+
+        MIDI.loader = new sketch.ui.Timer;
+        MIDI.loadPlugin({
+            soundfontUrl: "./soundfont/",
+            onsuccess: function() {
+                /// this is the language we are running in
+                /// this sets up the MIDI.Player and gets things going...
+                player = MIDI.Player;
+                player.timeWarp = 1; // speed the song is played back
+                console.log("About to load");
+                player.loadFile("./assets/layer1.mid", player.start);
+            }
+        });
+    });
+</script>
 </body>
 </html>

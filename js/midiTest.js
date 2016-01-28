@@ -2,10 +2,10 @@
  * Created by atg on 13/01/2016.
  */
 
-$(document).ready(function() {
-
+eventjs.add(window, "load", function(event) {
     var player;
 
+    MIDI.loader = new sketch.ui.Timer;
     MIDI.loadPlugin({
         soundfontUrl: "./soundfont/",
         onsuccess: function() {
@@ -13,16 +13,8 @@ $(document).ready(function() {
             /// this sets up the MIDI.Player and gets things going...
             player = MIDI.Player;
             player.timeWarp = 1; // speed the song is played back
+            console.log("About to load");
             player.loadFile("./assets/layer1.mid", player.start);
-            //player.loadFile("./assets/layer2.mid", player.start);
         }
-    });
-
-    $('#playMidi').on("click", function() {
-        //MIDIjs.play("assets/layer1.mid");
-    });
-
-    $('#stopMidi').on("click", function() {
-       //MIDIjs.stop();
     });
 });

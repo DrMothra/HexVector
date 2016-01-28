@@ -5,6 +5,8 @@
 var midiManager = (function() {
 
     var audioPlayers = [];
+    var numAudioFiles = 0;
+    var loadedFiles = 0;
 
     return {
 
@@ -28,18 +30,25 @@ var midiManager = (function() {
             fetch.send();
         },
 
-        loadMidiFile: function(file) {
-            this.loadRemote(file, function(data) {
-                var midiFile = MidiFile(data);
-                var synth = Synth(44100);
-                var replayer = Replayer(midiFile, synth);
-                var audioFile = {};
-                audioFile.midiFile = midiFile;
-                audioFile.synth = synth;
-                audioFile.replayer = replayer;
-                audioPlayers.push(audioFile);
-                AudioPlayer(replayer);
-            })
+        loadMidiFiles: function(files) {
+            numAudioFiles = files.length;
+            var _this = this;
+            for(var i=0; i<numAudioFiles; ++i) {
+                this.loadRemote(files[i], function(data) {
+                    var midiFile = MidiFile(data);
+                    var synth = Synth(44100);
+                    var replayer = Replayer(midiFile, synth);
+                    var audioFile = {};
+                    audioFile.midiFile = midiFile;
+                    audioFile.synth = synth;
+                    audioFile.replayer = replayer;
+                    audioPlayers.push(audioFile);
+                    if(++loadedFiles >= numAudioFiles) {
+                        _this.playAllFiles();
+                    }
+                })
+            }
+
         },
 
         play: function(fileId) {
@@ -47,22 +56,32 @@ var midiManager = (function() {
             AudioPlayer(replay);
         },
 
-        muteChannel: function(mute) {
-            console.log(audioPlayers[0]);
-            audioPlayers[0].replayer.setMute(mute);
+        playAllFiles: function() {
+            var replay;
+            for(var i=0; i<numAudioFiles; ++i) {
+                replay = audioPlayers[i].replayer;
+                AudioPlayer(replay);
+            }
+        },
+
+        muteChannel: function(channelId, mute) {
+            audioPlayers[channelId].replayer.setMute(mute);
         }
     }
 })();
 
 $(document).ready(function() {
-    midiManager.loadMidiFile("assets/layer1.mid");
-    //midiManager.loadMidiFile("assets/layer2.mid");
+    var midiFiles = ["assets/layer1.mid", "assets/layer2.mid", "assets/layer3.mid", "assets/layer4.mid", "assets/layer5.mid", "assets/layer6.mid"];
+    midiManager.loadMidiFiles(midiFiles);
 
-    //midiManager.play(0);
-    var channelMuted = false;
-    $('#mute').on("click", function() {
-        channelMuted = !channelMuted;
-        midiManager.muteChannel(channelMuted);
-    })
+    var channelsMuted = [false, false, false, false, false, false];
+    $('[id^=mute]').on("click", function() {
+        var id = this.id.charAt(this.id.length-1);
+        console.log("id = ", id);
+        channelsMuted[id] = !channelsMuted[id];
+        midiManager.muteChannel(id, channelsMuted[id]);
+        $('#muteStatus'+id).html(channelsMuted[id] ? "Off" : "On");
+    });
+
 });
 

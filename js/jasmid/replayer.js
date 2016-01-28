@@ -178,6 +178,6 @@ function Replayer(midiFile, synth) {
 		'generate': generate,
 		'setMute': setMute,
 		'finished': false
-	}
+	};
 	return self;
 }
